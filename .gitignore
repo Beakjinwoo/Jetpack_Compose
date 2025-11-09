@@ -7,9 +7,38 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/dictionaries
+/.idea/jarRepositories.xml
+/.idea/compiler.xml
+/.idea/misc.xml
+/.idea/deploymentTargetDropDown.xml
+/.idea/vcs.xml
 .DS_Store
 /build
+**/build/
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+
+# 빌드 결과물
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# 키스토어
+*.jks
+*.keystore
+
+# 로그
+*.log
+
+# Android Profiling
+*.hprof
+
+# Google Services
+google-services.json
+
+# Windows
+Thumbs.db
