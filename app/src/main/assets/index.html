@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웹뷰 테스트 페이지</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 15px 30px;
+            margin: 10px 0;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+        }
+        button:active {
+            background-color: #5568d3;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            min-height: 50px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>WebView 테스트</h1>
+    <p>JavaScript Bridge 함수 테스트</p>
+
+    <button onclick="testToast()">Toast 테스트 하기</button>
+    <button onclick="getDeviceInfo()">디바이스 정보</button>
+    <button onclick="getToken()">토큰 확인</button>
+
+    <div id="result">버튼 클릭</div>
+</div>
+
+<script>
+    function testToast() {
+        if (typeof Android !== 'undefined') {
+            Android.showToast("Toast 테스트 통과");
+            document.getElementById('result').innerHTML = "Toast message sent!";
+        } else {
+            document.getElementById('result').innerHTML = "Android object not found";
+        }
+    }
+
+    function getDeviceInfo() {
+        if (typeof Android !== 'undefined') {
+            var info = Android.getDeviceInfo();
+            document.getElementById('result').innerHTML = "Device: " + info;
+        } else {
+            document.getElementById('result').innerHTML = "Android object not found";
+        }
+    }
+
+    function getToken() {
+        if (typeof Android !== 'undefined') {
+            var token = Android.getUserToken();
+            document.getElementById('result').innerHTML = "Token: " + token;
+        } else {
+            document.getElementById('result').innerHTML = "Android object not found";
+        }
+    }
+
+    //코틀린에서 호출하는 함수
+    function updateUI(message){
+        document.getElementById('result').innerHTML = "서버에서 알림: " + message;
+    }
+</script>
+</body>
+</html>
