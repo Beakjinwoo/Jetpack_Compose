@@ -66,4 +66,6 @@ dependencies {
 
     // Coroutines (비동기 처리)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    // OkHttp Logging
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }
