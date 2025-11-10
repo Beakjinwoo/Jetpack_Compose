@@ -1,6 +1,5 @@
 package com.example.myapplication.Activity
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -30,16 +29,31 @@ import com.example.myapplication.data.LoginRequest
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-
+import com.example.myapplication.data.LoginData
 class LoginActivity : ComponentActivity() {
+    private lateinit var loginData: LoginData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (LocalContext != null){
+        loginData = LoginData(this)
 
+        //Flow라서 .collect
+        lifecycleScope.launch {
+            loginData.isLoggedIn.collect { isLoggedIn ->
+                if (isLoggedIn) {
+                    loginData.accessToken.collect { token ->
+                        if (token != null) {
+                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                            intent.putExtra("token", token)
+                            startActivity(intent)
+                            finish()
+                        }
+                    }
+                }
+            }
         }
+
 
         setContent {
             var username by remember { mutableStateOf("") }
@@ -98,9 +112,6 @@ class LoginActivity : ComponentActivity() {
     @Composable
     fun SubmitButton(username: String, password: String, onResult: (String) -> Unit) {
 
-        val context = LocalContext.current
-        val sharedPreferences = context.getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
-
         Button(
             onClick = {
                 Log.d("LOGIN", "Api 통신 시작")
@@ -112,13 +123,13 @@ class LoginActivity : ComponentActivity() {
                         )
 
                         if (response.isSuccessful) {
+
                             val token = response.body()?.accessToken
 
-                            sharedPreferences.edit().apply {
-                                putString("access_token", token)
-                                putBoolean("is_logged_in", true)
-                                apply()
+                            if (token != null){
+                                loginData.saveToken(token)
                             }
+
 
                             Log.d("LOGIN", "로그인 성공")
                             onResult("로그인 성공!")

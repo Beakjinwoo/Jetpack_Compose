@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
-import com.example.myapplication.HelperInstance.JsToKotlinInterface
+import com.example.myapplication.Instance.JsToKotlinInterface
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

@@ -1,4 +1,4 @@
-package com.example.myapplication.HelperInstance
+package com.example.myapplication.Instance
 
 import android.content.Context
 import android.os.Build
