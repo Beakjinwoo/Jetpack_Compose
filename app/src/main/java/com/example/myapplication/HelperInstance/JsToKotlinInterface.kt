@@ -1,6 +1,7 @@
-package com.example.myapplication
+package com.example.myapplication.HelperInstance
 
 import android.content.Context
+import android.os.Build
 import android.webkit.JavascriptInterface
 import android.widget.Toast
 
@@ -21,7 +22,7 @@ class JsToKotlinInterface(
     // 디바이스 정보 가져오기
     @JavascriptInterface
     fun getDeviceInfo(): String {
-        return "Android Device - API ${android.os.Build.VERSION.SDK_INT}"
+        return "Android Device - API ${Build.VERSION.SDK_INT}"
     }
 
     // 사용자 토큰 가져오기

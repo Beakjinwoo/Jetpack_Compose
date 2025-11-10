@@ -1,16 +1,17 @@
-package com.example.myapplication
+package com.example.myapplication.Activity
 
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
+import com.example.myapplication.HelperInstance.JsToKotlinInterface
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -34,7 +35,7 @@ class WebViewActivity : ComponentActivity() {
             WebViewScreen()
         }
 
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             delay(3000)
             callJavaScriptFunction()
         }
@@ -44,7 +45,7 @@ class WebViewActivity : ComponentActivity() {
     fun WebViewScreen() {
         val token = intent.getStringExtra("token")
         AndroidView(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.Companion.fillMaxSize(),
             factory = { context ->
                 WebView(context).apply {
                     webView = this
