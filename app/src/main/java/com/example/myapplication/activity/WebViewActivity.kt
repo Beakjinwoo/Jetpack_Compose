@@ -1,5 +1,6 @@
 package com.example.myapplication.activity
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -41,6 +42,7 @@ class WebViewActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Composable
     fun WebViewScreen() {
         val token = intent.getStringExtra("token")

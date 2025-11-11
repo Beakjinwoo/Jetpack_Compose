@@ -20,12 +20,15 @@ class LoginData(private val context: Context) {
     }
 
     // 토큰 저장
-    suspend fun saveToken(token: String) {
+    suspend fun saveToken(token: String?) {
 
         //Preferences는 KEY-VALUE 구조를 가진다.
         context.dataStore.edit { data ->
-            data[ACCESS_TOKEN] = token
-            data[IS_LOGGED_IN] = true
+            if(token != null){
+                data[ACCESS_TOKEN] = token
+                data[IS_LOGGED_IN] = true
+            }
+
         }
     }
 
@@ -36,6 +39,13 @@ class LoginData(private val context: Context) {
 
     val isLoggedIn: Flow<Boolean> = context.dataStore.data.map { data ->
         data[IS_LOGGED_IN] ?: false
+    }
+
+    suspend fun logout() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(ACCESS_TOKEN)
+            preferences.remove(IS_LOGGED_IN)
+        }
     }
 
     suspend fun clearToken() {
