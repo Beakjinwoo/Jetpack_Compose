@@ -48,9 +48,4 @@ class LoginData(private val context: Context) {
         }
     }
 
-    suspend fun clearToken() {
-        context.dataStore.edit { data ->
-            data.clear()
-        }
-    }
 }

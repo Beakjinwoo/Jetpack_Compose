@@ -7,20 +7,18 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.apiservice.RetrofitInstance
-import com.example.myapplication.data.login.ApiResponse
+import com.example.myapplication.state.ApiResponse
 import com.example.myapplication.data.login.LoginData
 import com.example.myapplication.data.login.LoginRequest
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
-
     var userName by mutableStateOf("")
         private set
     var passWord by mutableStateOf("")
         private set
-    var apiState by mutableStateOf<ApiResponse>(ApiResponse.Initial)
+    var apiState by mutableStateOf<ApiResponse>(ApiResponse.Loading)
         private set
-
 
     private lateinit var loginData: LoginData
 

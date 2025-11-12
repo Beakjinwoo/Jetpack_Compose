@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.data.login.ApiResponse
+import com.example.myapplication.state.ApiResponse
 import com.example.myapplication.data.login.LoginData
 import com.example.myapplication.viewmodel.LoginViewModel
 import kotlinx.coroutines.flow.first
@@ -94,9 +94,9 @@ class LoginActivity : ComponentActivity() {
                 SubmitButton(enabled = loginViewModel.apiState !is ApiResponse.Loading)
                 Spacer(modifier = Modifier.height(16.dp))
 
+
                 // Sealed class의 state로 UI변환
                 when (val state = loginViewModel.apiState) {
-                    is ApiResponse.Initial -> { }
                     is ApiResponse.Loading -> LoadingIndicator()
                     is ApiResponse.Error -> ErrorMessage(state.message)
                     is ApiResponse.Success -> SuccessMessage()
