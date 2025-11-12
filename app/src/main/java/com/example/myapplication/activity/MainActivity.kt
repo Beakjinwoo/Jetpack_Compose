@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
-import com.example.myapplication.data.LoginData
+import com.example.myapplication.data.login.LoginData
 import kotlinx.coroutines.launch
 
 

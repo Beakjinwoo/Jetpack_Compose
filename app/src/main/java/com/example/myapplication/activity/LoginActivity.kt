@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,18 +14,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import com.example.myapplication.data.LoginData
+import com.example.myapplication.data.login.ApiResponse
+import com.example.myapplication.data.login.LoginData
 import com.example.myapplication.viewmodel.LoginViewModel
 import kotlinx.coroutines.flow.first
 
@@ -36,10 +38,10 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         loginData = LoginData(this)
-
         loginViewModel.setLoginData(loginData)
 
         setContent {
+            //초기 로그인 데이터 확인
             LaunchedEffect(Unit) {
                 val isLoggedIn = loginData.isLoggedIn.first()
                 if (isLoggedIn) {
@@ -50,6 +52,23 @@ class LoginActivity : ComponentActivity() {
                 }
             }
 
+            // API state 확인 후 UI전환 + movetomain을 이관
+            LaunchedEffect(loginViewModel.apiState) {
+                when (val state = loginViewModel.apiState) {
+                    is ApiResponse.Success -> {
+                        moveToMain(state.token)
+                    }
+                    else -> { }
+                }
+            }
+
+            LoginScreen()
+        }
+    }
+
+    @Composable
+    fun LoginScreen() {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -57,16 +76,31 @@ class LoginActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                UsernameInput(loginViewModel.userName) { loginViewModel.updateUsername(it) }
+                UsernameInput(
+                    value = loginViewModel.userName,
+                    onValueChange = { loginViewModel.updateUsername(it) },
+                    enabled = loginViewModel.apiState !is ApiResponse.Loading
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                PasswordInput(loginViewModel.passWord) { loginViewModel.updatePassword(it)}
+                PasswordInput(
+                    value = loginViewModel.passWord,
+                    onValueChange = { loginViewModel.updatePassword(it) },
+                    enabled = loginViewModel.apiState !is ApiResponse.Loading
+
+                )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                SubmitButton()
+                SubmitButton(enabled = loginViewModel.apiState !is ApiResponse.Loading)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = loginViewModel.result)
+                // Sealed class의 state로 UI변환
+                when (val state = loginViewModel.apiState) {
+                    is ApiResponse.Initial -> { }
+                    is ApiResponse.Loading -> LoadingIndicator()
+                    is ApiResponse.Error -> ErrorMessage(state.message)
+                    is ApiResponse.Success -> SuccessMessage()
+                }
             }
         }
     }
@@ -79,43 +113,64 @@ class LoginActivity : ComponentActivity() {
     }
 
     @Composable
-    fun UsernameInput(value: String, onValueChange: (String) -> Unit) {
+    fun UsernameInput(value: String, onValueChange: (String) -> Unit, enabled: Boolean) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             placeholder = { Text("아이디를 입력해주세요") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled
         )
     }
 
     @Composable
-    fun PasswordInput(value: String, onValueChange: (String) -> Unit) {
+    fun PasswordInput(value: String, onValueChange: (String) -> Unit, enabled: Boolean) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             placeholder = { Text("비밀번호") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled
         )
     }
 
     @Composable
-    fun SubmitButton() {
+    fun SubmitButton(enabled: Boolean) {
         Button(
-            onClick = {
-                lifecycleScope.launch {
-                    val success = loginViewModel.login()
-                    if (success) {
-                        val token = loginData.accessToken.first()
-                        if (token != null) {
-                            moveToMain(token)
-                        }
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+            onClick = { loginViewModel.login() },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled
         ) {
             Text("로그인", fontSize = 16.sp)
         }
+    }
+
+    @Composable
+    fun LoadingIndicator() {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+
+    @Composable
+    fun ErrorMessage(message: String) {
+        Text(
+            text = message,
+            color = Color.Red,
+            fontSize = 14.sp
+        )
+    }
+
+    @Composable
+    fun SuccessMessage() {
+        Text(
+            text = "로그인 성공",
+            color = Color.Black,
+            fontSize = 14.sp
+        )
     }
 }
