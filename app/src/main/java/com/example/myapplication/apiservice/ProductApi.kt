@@ -9,6 +9,10 @@ import retrofit2.http.Header
 interface ProductApi {
 
     @GET("/product")
-    suspend fun GetProducts(@Header ("Authorization") accessToken: String , @Body request: ProductRequest)
+    suspend fun GetProducts(@Body request: ProductRequest)
     : List<ProductResponse>
+
+//    @GET("/product")
+//    suspend fun GetProducts(@Header ("Authorization") accessToken: String , @Body request: ProductRequest)
+//            : List<ProductResponse>
 }
