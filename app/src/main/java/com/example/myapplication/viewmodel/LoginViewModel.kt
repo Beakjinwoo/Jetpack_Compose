@@ -17,7 +17,7 @@ class LoginViewModel : ViewModel() {
         private set
     var passWord by mutableStateOf("")
         private set
-    var apiState by mutableStateOf<ApiResponse>(ApiResponse.Loading)
+    var apiState by mutableStateOf<ApiResponse>(ApiResponse.Initial)
         private set
 
     private lateinit var loginData: LoginData

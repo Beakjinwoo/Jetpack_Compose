@@ -29,6 +29,7 @@ import com.example.myapplication.state.ApiResponse
 import com.example.myapplication.data.login.LoginData
 import com.example.myapplication.viewmodel.LoginViewModel
 import kotlinx.coroutines.flow.first
+import com.example.myapplication.common.composable.LoadingIndicator
 
 class LoginActivity : ComponentActivity() {
     private lateinit var loginData: LoginData
@@ -97,6 +98,7 @@ class LoginActivity : ComponentActivity() {
 
                 // Sealed class의 state로 UI변환
                 when (val state = loginViewModel.apiState) {
+                    is ApiResponse.Initial -> {}
                     is ApiResponse.Loading -> LoadingIndicator()
                     is ApiResponse.Error -> ErrorMessage(state.message)
                     is ApiResponse.Success -> SuccessMessage()
@@ -145,17 +147,6 @@ class LoginActivity : ComponentActivity() {
             Text("로그인", fontSize = 16.sp)
         }
     }
-
-    @Composable
-    fun LoadingIndicator() {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    }
-
     @Composable
     fun ErrorMessage(message: String) {
         Text(
