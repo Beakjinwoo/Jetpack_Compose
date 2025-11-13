@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,42 +57,52 @@ class MainActivity : ComponentActivity() {
     fun MainScreen(token: String?) {
         val uiState = mainViewModel.mainUiState
 
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Title()
-            Spacer(modifier = Modifier.height(8.dp))
+            item { Title() }
+            item { Spacer(modifier = Modifier.height(8.dp)) }
 
             when (uiState) {
-                //LoadingIndicator를 Common으로 한 후, 불러오기
-                is MainUiState.Initial -> {
-                }
+                is MainUiState.Initial -> {}
                 is MainUiState.Success -> {
-                    LoadWelcomeMessage(uiState.mainResponse.welcomeMessage)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    LoadUserData(
+                    item { LoadWelcomeMessage(uiState.mainResponse.welcomeMessage) }
+                    item { Spacer(modifier = Modifier.height(16.dp)) }
+                    item { LoadUserData(
                         name = uiState.mainResponse.user.name,
                         email = uiState.mainResponse.user.email
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    LoadTodos(uiState.mainResponse.todos)
+                    ) }
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
+                    item {
+                        Text(
+                            text = "오늘의 할 일",
+                            fontSize = 18.sp,
+                            color = Color.Black,
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                    }
+                    items(uiState.mainResponse.todos) { todo ->
+                        TodoItem(todo)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
                 is MainUiState.Error -> {
-
-                    Text(
-                        text = "에러: ${uiState.message}",
-                        fontSize = 14.sp,
-                        color = Color.Black
-                    )
+                    item {
+                        Text(
+                            text = "에러: ${uiState.message}",
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Buttons(token)
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { Buttons(token) }
         }
     }
 
@@ -192,30 +204,6 @@ class MainActivity : ComponentActivity() {
             color = Color.Black,
             modifier = Modifier.padding(vertical = 8.dp)
         )
-    }
-
-    @Composable
-    fun LoadTodos(todos: List<Todos>) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "오늘의 할 일",
-                fontSize = 18.sp,
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(todos) { todo ->
-                    TodoItem(todo)
-                }
-            }
-        }
     }
 
     @Composable
