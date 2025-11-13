@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,12 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import com.example.myapplication.common.composable.LoadingIndicator
 import com.example.myapplication.data.login.LoginData
 import com.example.myapplication.data.main.Todos
 import com.example.myapplication.state.MainUiState
@@ -44,7 +44,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //초기화 잊지 말기
         loginData = LoginData(this)
         val token = intent.getStringExtra("token")
         mainViewModel.loadContents(this)
@@ -53,68 +52,68 @@ class MainActivity : ComponentActivity() {
             MainScreen(token)
         }
     }
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainScreen(token: String?) {
         val uiState = mainViewModel.mainUiState
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            item { Title() }
-            item { Spacer(modifier = Modifier.height(8.dp)) }
-
-            when (uiState) {
-                is MainUiState.Initial -> {}
-                is MainUiState.Success -> {
-                    item { LoadWelcomeMessage(uiState.mainResponse.welcomeMessage) }
-                    item { Spacer(modifier = Modifier.height(16.dp)) }
-                    item { LoadUserData(
-                        name = uiState.mainResponse.user.name,
-                        email = uiState.mainResponse.user.email
-                    ) }
-                    item { Spacer(modifier = Modifier.height(24.dp)) }
-                    item {
-                        Text(
-                            text = "오늘의 할 일",
-                            fontSize = 18.sp,
-                            color = Color.Black,
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        )
-                    }
-                    items(uiState.mainResponse.todos) { todo ->
-                        TodoItem(todo)
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
-                is MainUiState.Error -> {
-                    item {
-                        Text(
-                            text = "에러: ${uiState.message}",
-                            fontSize = 14.sp,
-                            color = Color.Black
-                        )
-                    }
-                }
+        PullToRefreshBox(
+            isRefreshing = mainViewModel.isRefreshing,
+            onRefresh = {
+                mainViewModel.refresh()
             }
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                item { Spacer(modifier = Modifier.height(8.dp)) }
 
-            item { Spacer(modifier = Modifier.height(16.dp)) }
-            item { Buttons(token) }
+                when (uiState) {
+                    is MainUiState.Initial -> {}
+                    is MainUiState.Refreshing -> {
+                        item { LoadingIndicator() }
+                    }
+                    is MainUiState.Success -> {
+                        item { LoadWelcomeMessage(uiState.mainResponse.welcomeMessage) }
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
+                        item { LoadUserData(
+                            name = uiState.mainResponse.user.name,
+                            email = uiState.mainResponse.user.email
+                        ) }
+                        item { Spacer(modifier = Modifier.height(24.dp)) }
+                        item {
+                            Text(
+                                text = "오늘의 할 일",
+                                fontSize = 18.sp,
+                                color = Color.Black,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+                        }
+                        items(uiState.mainResponse.todos) { todo ->
+                            TodoItem(todo)
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+                    is MainUiState.Error -> {
+                        item {
+                            Text(
+                                text = "에러: ${uiState.message}",
+                                fontSize = 14.sp,
+                                color = Color.Black
+                            )
+                        }
+                    }
+                }
+
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+                item { Buttons(token) }
+            }
         }
     }
-
-    @Composable
-    fun Title() {
-        Text(
-            text = "메인 화면입니다.(로그인 성공)",
-            fontSize = 28.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-    }
-
     @Composable
     fun Buttons(token: String?) {
         Column(

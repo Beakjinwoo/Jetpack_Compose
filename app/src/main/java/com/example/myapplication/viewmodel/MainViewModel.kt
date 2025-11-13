@@ -10,17 +10,28 @@ import com.example.myapplication.data.main.MainResponse
 import kotlinx.coroutines.launch
 import com.example.myapplication.state.MainUiState
 import com.google.gson.Gson
+import kotlinx.coroutines.delay
 
 class MainViewModel : ViewModel() {
-
 
     var mainUiState by mutableStateOf<MainUiState>(MainUiState.Initial)
         private set
 
+    var isRefreshing by mutableStateOf(false)
+        private set
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            delay(5000)
+            isRefreshing = false
+        }
+    }
 
 
     //초기화 함수
     fun loadContents(context: Context){
+
         viewModelScope.launch {
             try{
                 val mainResponse = loadMainResponse(context)
@@ -36,7 +47,6 @@ class MainViewModel : ViewModel() {
         val jsonString = context.assets.open("MainResponse.json")
             .bufferedReader()
             .use { it.readText() }
-
         return Gson().fromJson(jsonString, MainResponse::class.java)
     }
 }
