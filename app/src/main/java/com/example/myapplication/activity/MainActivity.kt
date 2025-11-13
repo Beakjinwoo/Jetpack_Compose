@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,15 +54,55 @@ class MainActivity : ComponentActivity() {
             MainScreen(token)
         }
     }
-    @OptIn(ExperimentalMaterial3Api::class)
+
     @Composable
     fun MainScreen(token: String?) {
         val uiState = mainViewModel.mainUiState
 
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (uiState) {
+                is MainUiState.Initial -> {
+                    LoadingIndicator()
+                }
+                is MainUiState.Success -> {
+                    MainScreenContainer(token, uiState)
+
+                    if (mainViewModel.isRefreshing) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
+                            LoadingIndicator()
+                        }
+                    }
+                }
+                is MainUiState.Error -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "에러: ${uiState.message}",
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun MainScreenContainer(token: String?, uiState: MainUiState.Success) {
         PullToRefreshBox(
             isRefreshing = mainViewModel.isRefreshing,
             onRefresh = {
-                mainViewModel.refresh()
+                mainViewModel.refresh(this@MainActivity)
             }
         ) {
             LazyColumn(
@@ -72,45 +114,33 @@ class MainActivity : ComponentActivity() {
             ) {
                 item { Spacer(modifier = Modifier.height(8.dp)) }
 
-                when (uiState) {
-                    is MainUiState.Initial -> {}
-                    is MainUiState.Refreshing -> {
-                        item { LoadingIndicator() }
-                    }
-                    is MainUiState.Success -> {
-                        item { LoadWelcomeMessage(uiState.mainResponse.welcomeMessage) }
-                        item { Spacer(modifier = Modifier.height(16.dp)) }
-                        item { LoadUserData(
-                            name = uiState.mainResponse.user.name,
-                            email = uiState.mainResponse.user.email
-                        ) }
-                        item { Spacer(modifier = Modifier.height(24.dp)) }
-                        item {
-                            Text(
-                                text = "오늘의 할 일",
-                                fontSize = 18.sp,
-                                color = Color.Black,
-                                modifier = Modifier.padding(bottom = 12.dp)
-                            )
-                        }
-                        items(uiState.mainResponse.todos) { todo ->
-                            TodoItem(todo)
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                    is MainUiState.Error -> {
-                        item {
-                            Text(
-                                text = "에러: ${uiState.message}",
-                                fontSize = 14.sp,
-                                color = Color.Black
-                            )
-                        }
-                    }
+                item { LoadWelcomeMessage(uiState.mainResponse.welcomeMessage) }
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+                item {
+                    LoadUserData(
+                        name = uiState.mainResponse.user.name,
+                        email = uiState.mainResponse.user.email
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(24.dp)) }
+                item {
+                    Text(
+                        text = "오늘의 할 일",
+                        fontSize = 18.sp,
+                        color = Color.Black,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
+                items(uiState.mainResponse.todos) { todo ->
+                    TodoItem(todo)
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 item { Spacer(modifier = Modifier.height(16.dp)) }
                 item { Buttons(token) }
+
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+                item {  UpdateName("진우")}
             }
         }
     }
@@ -231,6 +261,16 @@ class MainActivity : ComponentActivity() {
                     color = Color.Black
                 )
             }
+        }
+    }
+
+    @Composable
+    fun UpdateName(name: String){
+        Button(onClick = {
+            mainViewModel.setName(name)
+        }
+        ) {
+            Text("이름 변경")
         }
     }
 }

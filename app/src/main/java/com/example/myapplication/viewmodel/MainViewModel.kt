@@ -20,14 +20,26 @@ class MainViewModel : ViewModel() {
     var isRefreshing by mutableStateOf(false)
         private set
 
-    fun refresh() {
+    fun refresh(context: Context) {
         viewModelScope.launch {
             isRefreshing = true
-            delay(5000)
+            delay(1000)
+            loadContents(context)
             isRefreshing = false
         }
     }
 
+    fun setName(newName: String) {
+        when (val uiState = mainUiState) {
+            is MainUiState.Success -> {
+                val newUser = uiState.mainResponse.user.copy(name = newName)
+                val newMainResponse = uiState.mainResponse.copy(user = newUser)
+                mainUiState = MainUiState.Success(newMainResponse)
+            }
+            else -> {
+            }
+        }
+    }
 
     //초기화 함수
     fun loadContents(context: Context){
