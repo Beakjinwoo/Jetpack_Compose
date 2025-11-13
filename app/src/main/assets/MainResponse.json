@@ -1,0 +1,39 @@
+{
+  "user": {
+    "name": "주인",
+    "email": "juwon@example.com"
+  },
+  "welcomeMessage": "안녕하세요, 주인님! 오늘도 화이팅하세요 💪",
+  "todos": [
+    {
+      "id": 1,
+      "title": "프로그래머스 코딩테스트",
+      "subtitle": "동적 프로그래밍 문제 3개 풀기"
+    },
+    {
+      "id": 2,
+      "title": "Android Jetpack Compose 공부",
+      "subtitle": "LaunchedEffect와 SideEffect 차이 정리"
+    },
+    {
+      "id": 3,
+      "title": "POPIN 프로젝트 리팩토링",
+      "subtitle": "ViewModel 구조 개선 및 Repository 패턴 적용"
+    },
+    {
+      "id": 4,
+      "title": "블로그 포스팅",
+      "subtitle": "Sealed Class vs Enum 비교 글 작성"
+    },
+    {
+      "id": 5,
+      "title": "헬스장",
+      "subtitle": "하체 운동 1시간"
+    },
+    {
+      "id": 6,
+      "title": "장보기",
+      "subtitle": "우유, 계란, 빵, 과일"
+    }
+  ]
+}
