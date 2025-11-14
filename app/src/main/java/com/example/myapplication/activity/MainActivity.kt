@@ -152,6 +152,7 @@ class MainActivity : ComponentActivity() {
         ) {
             WebViewButton(token)
             LogoutButton()
+            goToProductActivity()
         }
     }
 
@@ -271,6 +272,20 @@ class MainActivity : ComponentActivity() {
         }
         ) {
             Text("이름 변경")
+        }
+    }
+
+    @Composable
+    fun goToProductActivity(){
+        Button(
+            onClick = {
+                val intent = Intent(this@MainActivity, ProductActivity::class.java)
+                startActivity(intent)
+                finish()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Product로 이동", fontSize = 16.sp)
         }
     }
 }

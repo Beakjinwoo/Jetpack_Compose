@@ -4,9 +4,9 @@ data class Restaurant(
     val id: String,
     val name: String,
     val thumbUrl: String,
-    val tags: Tags,
+    val tags: List<String>,
     val priceRange: String,
-    val ratings: Int,
+    val ratings: Double,
     val ratingsCount: Int,
     val deliveryTime: Int,
     val deliveryFee: Int

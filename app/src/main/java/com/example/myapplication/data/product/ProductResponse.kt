@@ -1,10 +1,6 @@
 package com.example.myapplication.data.product
 
-data class ProductResponse(
-    val id: String,
-    val restaurant: Restaurant,
-    val name: String,
-    val imgUrl: String,
-    val detail: String,
-    val price: Int
+data class ProductResponse<T>(
+    val meta: Meta,
+    val data: T
 )

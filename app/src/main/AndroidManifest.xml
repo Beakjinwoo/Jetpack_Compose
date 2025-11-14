@@ -37,6 +37,11 @@
             android:name=".activity.WebViewActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
+        <!-- ProductActivity  -->
+        <activity
+            android:name=".activity.ProductActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication" />
     </application>
 
 </manifest>
