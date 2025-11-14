@@ -17,8 +17,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.common.composable.LoadingIndicator
 import com.example.myapplication.data.product.Product
-import com.example.myapplication.data.product.Restaurant
 import com.example.myapplication.state.ProductApiState
 import com.example.myapplication.viewmodel.ProductViewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class ProductActivity: ComponentActivity() {
     private val productViewModel: ProductViewModel by viewModels()
@@ -46,10 +51,6 @@ class ProductActivity: ComponentActivity() {
     }
 
     @Composable
-    fun WebViewScreen(){
-
-    }
-    @Composable
     fun MainScreen() {
         when (val state = productViewModel.apiState) {
             is ProductApiState.Initial -> {
@@ -57,7 +58,7 @@ class ProductActivity: ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("데이터 불러오기")
+                    Text("데이터 로딩중...")
                 }
             }
 
@@ -67,17 +68,14 @@ class ProductActivity: ComponentActivity() {
                     contentAlignment = Alignment.Center
                 ) {
                     LoadingIndicator()
-                    productViewModel.loadContent()
                 }
             }
 
             is ProductApiState.Success -> {
-                // 데이터 로드 성공
                 ProductList(products = state.response)
             }
 
             is ProductApiState.Error -> {
-                // 에러 발생
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -94,10 +92,25 @@ class ProductActivity: ComponentActivity() {
         }
     }
 
-    //여기서 productViewModel.apiState => state가 loading으로 되어야 한다. (스크롤 위치로)
     @Composable
     fun ProductList(products: List<Product>) {
         val listState = rememberLazyListState()
+
+        // 마지막 아이템 도달 감지
+        val shouldLoadMore = remember {
+            derivedStateOf {
+                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                lastVisibleItem != null &&
+                        lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 3 // 마지막 3개 아이템 전에 로드
+            }
+        }
+
+        // 끝에 도달 시 loadContent
+        LaunchedEffect(shouldLoadMore.value) {
+            if (shouldLoadMore.value && !productViewModel.isLoading) {
+                productViewModel.loadContent()
+            }
+        }
 
         LazyColumn(
             state = listState,
@@ -105,16 +118,29 @@ class ProductActivity: ComponentActivity() {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            items(products) { product ->
-                ProductCard(product = product)
-                productViewModel.apiState
+            items(products.size) { index ->
+                ProductCard(product = products[index], number = index + 1)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // 로딩 시
+            if (productViewModel.isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         }
     }
 
-    //상품 리스트
     @Composable
-    fun ProductCard(product: Product) {
+    fun ProductCard(product: Product, number: Int) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -127,7 +153,7 @@ class ProductActivity: ComponentActivity() {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = product.name,
+                    text = "${number}번 제품 : ${product.name}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -135,7 +161,7 @@ class ProductActivity: ComponentActivity() {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = " 가게명: ${product.restaurant.name}",
+                    text = "가게명: ${product.restaurant.name}",
                     fontSize = 18.sp,
                     color = Color.Gray
                 )
@@ -151,7 +177,6 @@ class ProductActivity: ComponentActivity() {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // 상세 설명
                 Text(
                     text = product.detail,
                     fontSize = 18.sp,
@@ -160,21 +185,18 @@ class ProductActivity: ComponentActivity() {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // 추가정보
                 Text(
                     text = "${product.restaurant.ratings} (${product.restaurant.ratingsCount}개)",
                     fontSize = 18.sp,
                     color = Color.Black
                 )
 
-                // 배달정보
                 Text(
-                    text = "배달 시간 :${product.restaurant.deliveryTime}분 / 배달 가격 ${product.restaurant.deliveryFee}원",
+                    text = "배달 시간: ${product.restaurant.deliveryTime}분 / 배달 가격 ${product.restaurant.deliveryFee}원",
                     fontSize = 18.sp,
                     color = Color.Black
                 )
             }
         }
     }
-
 }
