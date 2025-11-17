@@ -140,7 +140,6 @@ class MainActivity : ComponentActivity() {
                 item { Buttons(token) }
 
                 item { Spacer(modifier = Modifier.height(16.dp)) }
-                item {  UpdateName("진우")}
             }
         }
     }
@@ -152,7 +151,7 @@ class MainActivity : ComponentActivity() {
         ) {
             WebViewButton(token)
             LogoutButton()
-            goToProductActivity()
+            GoToProductActivity()
         }
     }
 
@@ -266,17 +265,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun UpdateName(name: String){
-        Button(onClick = {
-            mainViewModel.setName(name)
-        }
-        ) {
-            Text("이름 변경")
-        }
-    }
-
-    @Composable
-    fun goToProductActivity(){
+    fun GoToProductActivity(){
         Button(
             onClick = {
                 val intent = Intent(this@MainActivity, ProductActivity::class.java)
