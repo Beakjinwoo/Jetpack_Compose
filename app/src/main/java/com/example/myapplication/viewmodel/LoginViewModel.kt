@@ -50,11 +50,12 @@ class LoginViewModel : ViewModel() {
                 )
 
                 if (response.isSuccessful) {
-                    val token = response.body()?.accessToken
-                    if (token != null) {
+                    val accessToken = response.body()?.accessToken
+                    val refreshToken = response.body()?.refreshToken
+                    if (accessToken != null && refreshToken != null) {
                         Log.d("LOGIN", "로그인 성공")
-                        loginData.saveToken(token)
-                        apiState = ApiResponse.Success(token)
+                        loginData.saveToken(accessToken, refreshToken)
+                        apiState = ApiResponse.Success(accessToken)
                     } else {
                         apiState = ApiResponse.Error("토큰이 없습니다")
                     }

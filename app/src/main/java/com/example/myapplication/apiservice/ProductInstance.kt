@@ -10,8 +10,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 object ProductInstance {
     private const val BASE_URL = "http://10.0.2.2:3000/"
 
-    private const val ACCESS_TOKEN: String = "YOUR_ACCESS_TOKEN"
+    private const val ACCESS_TOKEN: String = "eyJhbGciOiJIUI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RAY29kZWZhY3RvcnkuYWkiLCJzdWIiOiJmNTViMzJkMi00ZDY4LTRjMWUtYTNjYS1kYTlkN2QwZDkyZTUiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYzMzQ3MjcyLCJleHAiOjE3NjMzNDc1NzJ9.ZXkY7kSB-AGRCwn28NA2rjL3u__CB4NIud__nCy7Mhw"
 
+    private const val REFRESH_TOKEN: String = "YOUR_REFRESH_TOKEN"
 
     val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
