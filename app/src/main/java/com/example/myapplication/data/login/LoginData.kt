@@ -34,7 +34,7 @@ class LoginData(private val context: Context) {
 
 
 
-    //Flow ?: DataStore가 Flow를 반환한다
+    //Flow ?: DataStore가 Flow를 반환
     val accessToken: Flow<String?> = context.dataStore.data.map { data ->
         data[ACCESS_TOKEN]
     }
@@ -51,6 +51,7 @@ class LoginData(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences.remove(ACCESS_TOKEN)
             preferences.remove(IS_LOGGED_IN)
+            preferences.remove(REFRESH_TOKEN)
         }
     }
 

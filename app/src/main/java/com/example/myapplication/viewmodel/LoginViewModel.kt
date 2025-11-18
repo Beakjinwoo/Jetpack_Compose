@@ -45,15 +45,22 @@ class LoginViewModel : ViewModel() {
             Log.d("LOGIN", "Api 통신 시작")
 
             try {
-                val response = RetrofitInstance.api.postLoginRequest(
-                    LoginRequest(userName, passWord)
+                val credentials = "$userName:$passWord"
+                val basicAuth = "Basic " + android.util.Base64.encodeToString(
+                    credentials.toByteArray(),
+                    android.util.Base64.NO_WRAP
                 )
+
+                val response = RetrofitInstance.api.postLoginRequest(basicAuth)
 
                 if (response.isSuccessful) {
                     val accessToken = response.body()?.accessToken
                     val refreshToken = response.body()?.refreshToken
+
                     if (accessToken != null && refreshToken != null) {
+
                         Log.d("LOGIN", "로그인 성공")
+
                         loginData.saveToken(accessToken, refreshToken)
                         apiState = ApiResponse.Success(accessToken)
                     } else {

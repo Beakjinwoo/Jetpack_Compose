@@ -31,6 +31,8 @@ import com.example.myapplication.viewmodel.LoginViewModel
 import kotlinx.coroutines.flow.first
 import com.example.myapplication.common.composable.LoadingIndicator
 
+
+// 계정정보: test@codefactory.ai:testtest
 class LoginActivity : ComponentActivity() {
     private lateinit var loginData: LoginData
     private val loginViewModel: LoginViewModel by viewModels()
