@@ -1,15 +1,15 @@
 package com.example.myapplication.apiservice
 
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import android.util.Log
 import com.example.myapplication.data.login.LoginData
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 object ProductInstance {
     private const val BASE_URL = "http://10.0.2.2:3000/"
 
@@ -17,28 +17,36 @@ object ProductInstance {
 
     fun initialize(loginData: LoginData) {
         this.loginData = loginData
+        Log.d("ProductInstance", "초기화 완료")
     }
 
-
-    val loggingInterceptor = HttpLoggingInterceptor().apply {
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
-    private val client = OkHttpClient.Builder()
-        .addInterceptor ( loggingInterceptor)
-        .addInterceptor { a ->
+    // client도 lazy로 변경!
+    private val client by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor { chain ->
 
-            //위험도 존재, 대체바람
-            val token = runBlocking {
-                loginData.accessToken.first()
+                val token = runBlocking {
+                    loginData.accessToken.first()
+                }
+
+                val request = if (token != null) {
+                    chain.request().newBuilder()
+                        .addHeader("Authorization", "Bearer $token")
+                        .build()
+                } else {
+                    Log.e("ProductInstance", "토큰값 null")
+                    chain.request()
+                }
+
+                chain.proceed(request)
             }
-
-            val request = a.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
-                .build()
-            a.proceed(request)
-        }
-        .build()
+            .build()
+    }
 
     val api: ProductApi by lazy {
         Retrofit.Builder()
