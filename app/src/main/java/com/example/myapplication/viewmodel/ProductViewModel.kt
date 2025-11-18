@@ -26,7 +26,7 @@ class ProductViewModel : ViewModel() {
     //누적 리스트
     val preProducts = mutableListOf<Product>()
 
-    // 로딩 중복 방지
+    // 로딩 중복 방지 // fetchMore (더 가져오는 상태의 로딩)
     var isLoading by mutableStateOf(false)
         private set
 
@@ -49,11 +49,11 @@ class ProductViewModel : ViewModel() {
 
             try {
                 Log.d("ProductViewModel", "API 호출 ")
-                val response = ProductInstance.api.GetProducts(after, count)
+                val response = ProductInstance.api.getProducts(after, count)
 
                 if (response.isSuccessful) {
-                    Log.d("ProductViewModel", "API 응답 성공")
                     val productResponse = response.body()
+
 
                     if (productResponse != null) {
                         val products = productResponse.data

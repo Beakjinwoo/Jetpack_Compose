@@ -1,6 +1,6 @@
 package com.example.myapplication.data.product
 
-data class ProductResponse<T>(
+data class ProductResponse(
     val meta: Meta,
-    val data: T
+    val data: List<Product>
 )
