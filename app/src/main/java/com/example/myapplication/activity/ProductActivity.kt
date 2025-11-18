@@ -30,7 +30,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.apiservice.ProductInstance
 import com.example.myapplication.common.composable.LoadingIndicator
+import com.example.myapplication.data.login.LoginData
 import com.example.myapplication.data.product.Product
 import com.example.myapplication.state.ProductApiState
 import com.example.myapplication.viewmodel.ProductViewModel
@@ -41,6 +43,10 @@ class ProductActivity: ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val loginData = LoginData(this)
+
+        ProductInstance.initialize(loginData = loginData)
 
         // 초기 데이터 로드
         productViewModel.loadContent()
@@ -100,6 +106,7 @@ class ProductActivity: ComponentActivity() {
         val shouldLoadMore = remember {
             derivedStateOf {
                 val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+
                 lastVisibleItem != null &&
                         lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 3 // 마지막 3개 아이템 전에 로드
             }
