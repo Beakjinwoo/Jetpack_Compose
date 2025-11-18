@@ -37,7 +37,6 @@ import com.example.myapplication.state.MainUiState
 import com.example.myapplication.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
-
 class MainActivity : ComponentActivity() {
 
     private lateinit var loginData: LoginData
@@ -152,6 +151,7 @@ class MainActivity : ComponentActivity() {
             WebViewButton(token)
             LogoutButton()
             GoToProductActivity()
+            GoToPhoneAuthActivity()
         }
     }
 
@@ -275,6 +275,20 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Product로 이동", fontSize = 16.sp)
+        }
+    }
+
+    @Composable
+    fun GoToPhoneAuthActivity(){
+        Button(
+            onClick = {
+                val intent = Intent(this@MainActivity, PhoneAuthActivity::class.java)
+                startActivity(intent)
+                finish()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("휴대폰 인증 이동", fontSize = 16.sp)
         }
     }
 }

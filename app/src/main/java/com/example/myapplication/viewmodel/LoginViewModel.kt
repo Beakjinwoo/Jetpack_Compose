@@ -60,6 +60,9 @@ class LoginViewModel : ViewModel() {
                     if (accessToken != null && refreshToken != null) {
 
                         Log.d("LOGIN", "로그인 성공")
+                        Log.d("LOGIN", "accessToken: $accessToken")
+                        Log.d("LOGIN", "refreshToken: $refreshToken")
+
 
                         loginData.saveToken(accessToken, refreshToken)
                         apiState = ApiResponse.Success(accessToken)

@@ -4,15 +4,21 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.myapplication.data.login.LoginData
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
 object ProductInstance {
     private const val BASE_URL = "http://10.0.2.2:3000/"
 
-    private const val ACCESS_TOKEN: String = "eyJhbGciOiJIUI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RAY29kZWZhY3RvcnkuYWkiLCJzdWIiOiJmNTViMzJkMi00ZDY4LTRjMWUtYTNjYS1kYTlkN2QwZDkyZTUiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYzMzQ3MjcyLCJleHAiOjE3NjMzNDc1NzJ9.ZXkY7kSB-AGRCwn28NA2rjL3u__CB4NIud__nCy7Mhw"
+    private lateinit var loginData: LoginData
 
-    private const val REFRESH_TOKEN: String = "YOUR_REFRESH_TOKEN"
+    fun initialize(loginData: LoginData) {
+        this.loginData = loginData
+    }
+
 
     val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -21,8 +27,14 @@ object ProductInstance {
     private val client = OkHttpClient.Builder()
         .addInterceptor ( loggingInterceptor)
         .addInterceptor { a ->
+
+            //위험도 존재, 대체바람
+            val token = runBlocking {
+                loginData.accessToken.first()
+            }
+
             val request = a.request().newBuilder()
-                .addHeader("Authorization", "Bearer $ACCESS_TOKEN")
+                .addHeader("Authorization", "Bearer $token")
                 .build()
             a.proceed(request)
         }
