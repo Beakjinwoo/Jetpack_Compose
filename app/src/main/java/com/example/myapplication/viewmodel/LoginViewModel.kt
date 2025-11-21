@@ -6,10 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.apiservice.RetrofitInstance
+import com.example.myapplication.apiservice.LoginInstance
 import com.example.myapplication.state.ApiResponse
 import com.example.myapplication.data.login.LoginData
-import com.example.myapplication.data.login.LoginRequest
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
@@ -51,7 +50,7 @@ class LoginViewModel : ViewModel() {
                     android.util.Base64.NO_WRAP
                 )
 
-                val response = RetrofitInstance.api.postLoginRequest(basicAuth)
+                val response = LoginInstance.api.postLoginRequest(basicAuth)
 
                 if (response.isSuccessful) {
                     val accessToken = response.body()?.accessToken
