@@ -19,7 +19,7 @@ object ApiInstance {
 
     fun initialize(loginData: LoginData) {
         this.loginData = loginData
-        Log.d("ProductInstance", "초기화 완료")
+        Log.d("ApiInstance", "초기화 완료")
     }
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -40,7 +40,7 @@ object ApiInstance {
                         .addHeader("Authorization", "Bearer $token")
                         .build()
                 } else {
-                    Log.e("ProductInstance", "토큰값 null")
+                    Log.e("ApiInstance", "토큰값 null")
                     chain.request()
                 }
 
@@ -49,30 +49,24 @@ object ApiInstance {
             .build()
     }
 
-    val loginApi: LoginApi by lazy {
+    // Retrofit 인스턴스는 하나만 ㅁ난든다.
+    private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(loginApi::class.java)
+    }
+
+    val loginApi: LoginApi by lazy {
+        retrofit.create(LoginApi::class.java)
     }
 
     val productApi: ProductApi by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
-            .create(ProductApi::class.java)
+        retrofit.create(ProductApi::class.java)
     }
 
-    val RestaurantApi: RestaurantApi by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
-            .create(RestaurantApi::class.java)
+    val restaurantApi: RestaurantApi by lazy {
+        retrofit.create(RestaurantApi::class.java)
     }
 }
