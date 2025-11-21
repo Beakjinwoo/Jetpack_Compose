@@ -1,3 +1,12 @@
+import java.util.Properties
+
+// local.properties 로드
+val localProps = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localProps.load(localPropsFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +15,7 @@ plugins {
 
 android {
     namespace = "com.example.myapplication"
+
     compileSdk {
         version = release(36)
     }
@@ -16,28 +26,57 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // BuildConfig 활성화 필수
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "DEV_BASE_URL",
+                "\"${localProps["DEV_BASE_URL"]}\""
+            )
+            buildConfigField(
+                "String",
+                "EMULATOR_BASE_URL",
+                "\"${localProps["EMULATOR_BASE_URL"]}\""
+            )
+        }
+
         release {
             isMinifyEnabled = false
+
+            buildConfigField(
+                "String",
+                "DEV_BASE_URL",
+                "\"${localProps["DEV_BASE_URL"]}\""
+            )
+            buildConfigField(
+                "String",
+                "EMULATOR_BASE_URL",
+                "\"${localProps["EMULATOR_BASE_URL"]}\""
+            )
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
     }
 }
 

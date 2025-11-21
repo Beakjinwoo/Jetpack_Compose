@@ -1,5 +1,7 @@
-package com.example.myapplication.Instance
+package com.example.myapplication.instance
 
+import com.example.myapplication.BuildConfig
+import android.os.Build
 import android.util.Log
 import com.example.myapplication.api.LoginApi
 import com.example.myapplication.api.ProductApi
@@ -13,7 +15,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiInstance {
-    private const val BASE_URL = "http://10.0.2.2:3000/"
+    private val BASE_URL: String = if (Build.FINGERPRINT.contains("generic")) {
+        BuildConfig.EMULATOR_BASE_URL   // 에뮬레이터
+    } else {
+        BuildConfig.DEV_BASE_URL        // 실제 기기
+    }
 
     private lateinit var loginData: LoginData
 
