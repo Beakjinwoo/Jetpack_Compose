@@ -43,10 +43,5 @@
             android:name=".activity.ProductActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
-        <activity
-            android:name=".activity.PhoneAuthActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyApplication" />
     </application>
-
 </manifest>
