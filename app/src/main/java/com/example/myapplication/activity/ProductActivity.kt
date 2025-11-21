@@ -4,25 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -32,21 +20,25 @@ import com.example.myapplication.Instance.ApiInstance
 import com.example.myapplication.common.composable.LoadingIndicator
 import com.example.myapplication.data.login.LoginData
 import com.example.myapplication.data.product.Product
+import com.example.myapplication.data.restaurant.Restaurant
 import com.example.myapplication.state.ProductApiState
+import com.example.myapplication.state.RestaurantApiState
 import com.example.myapplication.viewmodel.ProductViewModel
+import com.example.myapplication.viewmodel.RestaurantViewModel
 
-class ProductActivity: ComponentActivity() {
+class ProductActivity : ComponentActivity() {
     private val productViewModel: ProductViewModel by viewModels()
+    private val restaurantViewModel: RestaurantViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val loginData = LoginData(this)
+        ApiInstance.initialize(loginData)
 
-        ApiInstance.initialize(loginData = loginData)
-
-        // 초기 데이터 로드
+        // 초기 로드
         productViewModel.loadContent()
+        restaurantViewModel.loadContent()
 
         setContent {
             MainScreen()
@@ -55,61 +47,74 @@ class ProductActivity: ComponentActivity() {
 
     @Composable
     fun MainScreen() {
+
+        var selectedTab by remember { mutableIntStateOf(0) }
+        val tabTitles = listOf("제품", "레스토랑")
+
+        Column {
+
+            PrimaryTabRow(
+                selectedTabIndex = selectedTab,
+            ) {
+                tabTitles.forEachIndexed { index, title ->
+                    Tab(
+                        //인덱스 0 -> 제품 / 1 -> 레스토랑 & seletedTab = 현재 선택한 탭
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index },
+                        text = { Text(title) }
+                    )
+                }
+            }
+            when (selectedTab) {
+                0 -> ProductScreen()
+                1 -> RestaurantScreen()
+            }
+        }
+    }
+    @Composable
+    fun ProductScreen() {
         when (val state = productViewModel.apiState) {
-            is ProductApiState.Initial -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("데이터 로딩중...")
-                }
-            }
-
-            is ProductApiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    LoadingIndicator()
-                }
-            }
-
-            is ProductApiState.Success -> {
-                ProductList(products = state.response)
-            }
-
-            is ProductApiState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "오류: ${state.message}", color = Color.Red)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { productViewModel.loadContent() }) {
-                            Text("재시도")
-                        }
+            is ProductApiState.Initial -> Text("데이터 로딩중...")
+            is ProductApiState.Loading -> LoadingIndicator()
+            is ProductApiState.Success -> ProductList(state.response)
+            is ProductApiState.Error ->  {
+                Column {
+                    Text("오류가 발생했습니다. ${state.message}")
+                    Button(onClick = { productViewModel.loadContent() }) {
+                        Text("재시도")
                     }
                 }
             }
         }
     }
-
+    @Composable
+    fun RestaurantScreen() {
+        when (val state = restaurantViewModel.apiState) {
+            is RestaurantApiState.Initial -> Text("데이터 로딩중...")
+            is RestaurantApiState.Loading -> LoadingIndicator()
+            is RestaurantApiState.Success -> RestaurantList(state.response)
+            is RestaurantApiState.Error ->  {
+                Column {
+                    Text("오류가 발생했습니다. ${state.message}")
+                    Button(onClick = { restaurantViewModel.loadContent() }) {
+                        Text("재시도")
+                    }
+                }
+            }
+        }
+    }
     @Composable
     fun ProductList(products: List<Product>) {
         val listState = rememberLazyListState()
 
-        // 마지막 아이템 도달 감지
         val shouldLoadMore = remember {
             derivedStateOf {
-                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-
-                lastVisibleItem != null &&
-                        lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 3 // 마지막 3개 아이템 전에 로드
+                val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                last != null &&
+                        last.index >= listState.layoutInfo.totalItemsCount - 3
             }
         }
 
-        // 끝에 도달 시 loadContent
         LaunchedEffect(shouldLoadMore.value) {
             if (shouldLoadMore.value && !productViewModel.isLoading) {
                 productViewModel.loadContent()
@@ -119,25 +124,17 @@ class ProductActivity: ComponentActivity() {
         LazyColumn(
             state = listState,
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(16.dp)
         ) {
             items(products.size) { index ->
-                ProductCard(product = products[index], number = index + 1)
-                Spacer(modifier = Modifier.height(8.dp))
+                ProductCard(products[index], index + 1)
+                Spacer(Modifier.height(8.dp))
             }
 
-            // 로딩 시
             if (productViewModel.isLoading) {
                 item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    LoadingIndicator()
                 }
             }
         }
@@ -146,60 +143,84 @@ class ProductActivity: ComponentActivity() {
     @Composable
     fun ProductCard(product: Product, number: Int) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = Color.Gray,
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "${number}번 제품 : ${product.name}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+            Column(Modifier.padding(16.dp)) {
+                Text("${number}번 제품 : ${product.name}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(4.dp))
+                Text("가게명: ${product.restaurant.name}", fontSize = 16.sp)
+                Text("가격: ${product.price}원", fontSize = 16.sp)
+                Spacer(Modifier.height(8.dp))
+                Text(product.detail, fontSize = 16.sp)
+                Spacer(Modifier.height(8.dp))
+                Text("${product.restaurant.ratings} (${product.restaurant.ratingsCount}개)", fontSize = 16.sp)
+                Spacer(Modifier.height(8.dp))
+                Text("배달 시간: ${product.restaurant.deliveryTime}분 / 배달 ${product.restaurant.deliveryFee}원", fontSize = 16.sp)
+            }
+        }
+    }
 
-                Spacer(modifier = Modifier.height(8.dp))
+    @Composable
+    fun RestaurantList(restaurants: List<Restaurant>) {
+        val listState = rememberLazyListState()
 
-                Text(
-                    text = "가게명: ${product.restaurant.name}",
-                    fontSize = 18.sp,
-                    color = Color.Gray
-                )
+        val shouldLoadMore = remember {
+            derivedStateOf {
+                val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                last != null &&
+                        last.index >= listState.layoutInfo.totalItemsCount - 3
+            }
+        }
 
-                Spacer(modifier = Modifier.height(4.dp))
+        LaunchedEffect(shouldLoadMore.value) {
+            if (shouldLoadMore.value && !restaurantViewModel.fetchMore) {
+                restaurantViewModel.loadContent()
+            }
+        }
 
-                Text(
-                    text = "가격: ${product.price}원",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black
-                )
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            items(restaurants.size) { index ->
+                RestaurantCard(restaurants[index], index + 1)
+                Spacer(Modifier.height(8.dp))
+            }
 
-                Spacer(modifier = Modifier.height(4.dp))
+            if (restaurantViewModel.fetchMore) {
+                item { LoadingIndicator() }
+            }
+        }
+    }
 
-                Text(
-                    text = product.detail,
-                    fontSize = 18.sp,
-                    color = Color.Black
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "${product.restaurant.ratings} (${product.restaurant.ratingsCount}개)",
-                    fontSize = 18.sp,
-                    color = Color.Black
-                )
-
-                Text(
-                    text = "배달 시간: ${product.restaurant.deliveryTime}분 / 배달 가격 ${product.restaurant.deliveryFee}원",
-                    fontSize = 18.sp,
-                    color = Color.Black
-                )
+    @Composable
+    fun RestaurantCard(restaurant: Restaurant, number: Int) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = Color.Gray,
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text("${number}번 가게 : ${restaurant.name}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(4.dp))
+                Text("평점: ${restaurant.ratings}", fontSize = 16.sp)
+                Text("리뷰 수: ${restaurant.ratingsCount}", fontSize = 16.sp)
+                Text("배달비: ${restaurant.deliveryFee}원", fontSize = 16.sp)
+                Text("배달시간: ${restaurant.deliveryTime}분", fontSize = 16.sp)
             }
         }
     }
