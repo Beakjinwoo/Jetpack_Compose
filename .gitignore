@@ -12,7 +12,16 @@
 /.idea/compiler.xml
 /.idea/misc.xml
 /.idea/deploymentTargetDropDown.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/deviceManager.xml
+/.idea/appInsightsSettings.xml
 /.idea/vcs.xml
+/.idea/.name
+/.idea/AndroidProjectSystem.xml
+/.idea/migrations.xml
+/.idea/runConfigurations.xml
+/.idea/inspectionProfiles/
+/.idea/shelf/
 .DS_Store
 /build
 **/build/
