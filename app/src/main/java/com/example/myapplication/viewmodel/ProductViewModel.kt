@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.apiservice.ProductInstance
+import com.example.myapplication.Instance.ApiInstance
 import com.example.myapplication.data.product.Product
 import kotlinx.coroutines.launch
 
@@ -49,7 +49,7 @@ class ProductViewModel : ViewModel() {
 
             try {
                 Log.d("ProductViewModel", "API 호출 ")
-                val response = ProductInstance.productApi.getProducts(after, count)
+                val response = ApiInstance.productApi.getProducts(after, count)
 
                 if (response.isSuccessful) {
                     val productResponse = response.body()

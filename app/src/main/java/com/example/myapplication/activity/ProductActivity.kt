@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -23,20 +22,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.apiservice.ProductInstance
+import com.example.myapplication.Instance.ApiInstance
 import com.example.myapplication.common.composable.LoadingIndicator
 import com.example.myapplication.data.login.LoginData
 import com.example.myapplication.data.product.Product
 import com.example.myapplication.state.ProductApiState
 import com.example.myapplication.viewmodel.ProductViewModel
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 class ProductActivity: ComponentActivity() {
     private val productViewModel: ProductViewModel by viewModels()
@@ -46,7 +43,7 @@ class ProductActivity: ComponentActivity() {
 
         val loginData = LoginData(this)
 
-        ProductInstance.initialize(loginData = loginData)
+        ApiInstance.initialize(loginData = loginData)
 
         // 초기 데이터 로드
         productViewModel.loadContent()

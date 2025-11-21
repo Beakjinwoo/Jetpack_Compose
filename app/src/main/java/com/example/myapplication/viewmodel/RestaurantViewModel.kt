@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.apiservice.ProductInstance
+import com.example.myapplication.Instance.ApiInstance
 import com.example.myapplication.data.restaurant.Restaurant
 import com.example.myapplication.state.RestaurantApiState
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ class RestaurantViewModel : ViewModel() {
 
             try {
                 Log.d("RestaurantViewModel", "API 호출 ")
-                val response = ProductInstance.Restaurantapi.getRestaurants(after, count)
+                val response = ApiInstance.RestaurantApi.getRestaurants(after, count)
 
                 if (response.isSuccessful) {
                     val restaurantResponse = response.body()

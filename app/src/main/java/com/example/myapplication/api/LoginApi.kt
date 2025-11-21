@@ -1,10 +1,8 @@
-package com.example.myapplication.apiservice
+package com.example.myapplication.api
 
-import com.example.myapplication.data.login.LoginRequest
 import com.example.myapplication.data.login.LoginResponse
 import com.example.myapplication.data.login.RefreshResponse
 import retrofit2.Response
-import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
 
