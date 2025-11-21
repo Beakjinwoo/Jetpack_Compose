@@ -122,7 +122,7 @@ class ProductActivity: ComponentActivity() {
         LazyColumn(
             state = listState,
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(16.dp)
         ) {
             items(products.size) { index ->
