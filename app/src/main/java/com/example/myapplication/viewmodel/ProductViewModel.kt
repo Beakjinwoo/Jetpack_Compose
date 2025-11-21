@@ -49,7 +49,7 @@ class ProductViewModel : ViewModel() {
 
             try {
                 Log.d("ProductViewModel", "API 호출 ")
-                val response = ProductInstance.api.getProducts(after, count)
+                val response = ProductInstance.productApi.getProducts(after, count)
 
                 if (response.isSuccessful) {
                     val productResponse = response.body()

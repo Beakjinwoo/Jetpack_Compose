@@ -1,4 +1,4 @@
-package com.example.myapplication.data.product
+package com.example.myapplication.data.restaurant
 
 data class Restaurant(
     val id: String,

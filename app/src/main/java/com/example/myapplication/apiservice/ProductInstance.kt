@@ -24,7 +24,6 @@ object ProductInstance {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
-    // client도 lazy로 변경!
     private val client by lazy {
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
@@ -48,12 +47,21 @@ object ProductInstance {
             .build()
     }
 
-    val api: ProductApi by lazy {
+    val productApi: ProductApi by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
             .create(ProductApi::class.java)
+    }
+
+    val RestaurantApi: ProductApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+            .create(RestaurantApi::class.java)
     }
 }
