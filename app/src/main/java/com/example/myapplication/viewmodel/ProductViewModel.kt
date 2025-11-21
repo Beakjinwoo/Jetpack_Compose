@@ -33,10 +33,6 @@ class ProductViewModel : ViewModel() {
     var apiState by mutableStateOf<ProductApiState>(ProductApiState.Initial)
         private set
 
-
-    fun updateAfter(after: String) {
-        this.after = after
-    }
     fun loadContent() {
 
         // 중복 방지
@@ -56,13 +52,13 @@ class ProductViewModel : ViewModel() {
 
 
                     if (productResponse != null) {
-                        val products = productResponse.data
+                        val newProducts = productResponse.data
 
-                        if (products.isNotEmpty()) {
-                            preProducts.addAll(products)
-                            productCount += products.size
+                        if (newProducts.isNotEmpty()) {
+                            preProducts.addAll(newProducts)
+                            productCount += newProducts.size
                             // 마지막 상품의 id를 after로 지정
-                            updateAfter(products.last().id)
+                            after = newProducts.last().id
                             apiState = ProductApiState.Success(preProducts.toList())
                             Log.d("ProductViewModel", "데이터 추가 성공")
                         } else {

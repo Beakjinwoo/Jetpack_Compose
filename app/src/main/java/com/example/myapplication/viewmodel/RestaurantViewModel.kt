@@ -39,7 +39,7 @@ class RestaurantViewModel : ViewModel() {
 
             try {
                 Log.d("RestaurantViewModel", "API 호출 ")
-                val response = ApiInstance.RestaurantApi.getRestaurants(after, count)
+                val response = ApiInstance.restaurantApi.getRestaurants(after, count)
 
                 if (response.isSuccessful) {
                     val restaurantResponse = response.body()
