@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.Instance.ApiInstance
+import com.example.myapplication.instance.ApiInstance
 import com.example.myapplication.common.composable.LoadingIndicator
 import com.example.myapplication.data.login.LoginData
 import com.example.myapplication.data.product.Product

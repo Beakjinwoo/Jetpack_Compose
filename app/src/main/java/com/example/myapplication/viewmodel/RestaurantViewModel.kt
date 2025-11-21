@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.Instance.ApiInstance
+import com.example.myapplication.instance.ApiInstance
 import com.example.myapplication.data.restaurant.Restaurant
 import com.example.myapplication.state.RestaurantApiState
 import kotlinx.coroutines.launch
