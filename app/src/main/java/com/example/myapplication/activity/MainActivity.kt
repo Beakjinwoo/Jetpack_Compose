@@ -269,7 +269,6 @@ class MainActivity : ComponentActivity() {
             onClick = {
                 val intent = Intent(this@MainActivity, ProductActivity::class.java)
                 startActivity(intent)
-                finish()
             },
             modifier = Modifier.fillMaxWidth()
         ) {
