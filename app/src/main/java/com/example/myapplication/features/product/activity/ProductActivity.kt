@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -50,6 +51,10 @@ class ProductActivity : ComponentActivity() {
         var selectedTab by remember { mutableIntStateOf(0) }
         val tabTitles = listOf("제품", "레스토랑")
 
+        // 스크롤 상태 유지
+        val productListState = rememberLazyListState()
+        val restaurantListState = rememberLazyListState()
+
         Column {
 
             PrimaryTabRow(
@@ -65,17 +70,17 @@ class ProductActivity : ComponentActivity() {
                 }
             }
             when (selectedTab) {
-                0 -> ProductScreen()
-                1 -> RestaurantScreen()
+                0 -> ProductScreen(productListState)
+                1 -> RestaurantScreen(restaurantListState)
             }
         }
     }
     @Composable
-    fun ProductScreen() {
+    fun ProductScreen(listState: LazyListState) {
         when (val state = productViewModel.apiState) {
             is PaginationApiState.Initial -> Text("데이터 로딩중...")
             is PaginationApiState.Loading -> LoadingIndicator()
-            is PaginationApiState.Success -> ProductList(state.response)
+            is PaginationApiState.Success -> ProductList(state.response, listState)
             is PaginationApiState.Error ->  {
                 Column {
                     Text("오류가 발생했습니다. ${state.message}")
@@ -87,11 +92,11 @@ class ProductActivity : ComponentActivity() {
         }
     }
     @Composable
-    fun RestaurantScreen() {
+    fun RestaurantScreen(listState: LazyListState) {
         when (val state = restaurantViewModel.apiState) {
             is PaginationApiState.Initial -> Text("데이터 로딩중...")
             is PaginationApiState.Loading -> LoadingIndicator()
-            is PaginationApiState.Success -> RestaurantList(state.response)
+            is PaginationApiState.Success -> RestaurantList(state.response, listState)
             is PaginationApiState.Error ->  {
                 Column {
                     Text("오류가 발생했습니다. ${state.message}")
@@ -103,9 +108,7 @@ class ProductActivity : ComponentActivity() {
         }
     }
     @Composable
-    fun ProductList(products: List<Product>) {
-        val listState = rememberLazyListState()
-
+    fun ProductList(products: List<Product>, listState: LazyListState) {
         val shouldLoadMore = remember {
             derivedStateOf {
                 val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()
@@ -167,9 +170,7 @@ class ProductActivity : ComponentActivity() {
     }
 
     @Composable
-    fun RestaurantList(restaurants: List<Restaurant>) {
-        val listState = rememberLazyListState()
-
+    fun RestaurantList(restaurants: List<Restaurant>, listState: LazyListState) {
         val shouldLoadMore = remember {
             derivedStateOf {
                 val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()
