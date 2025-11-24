@@ -4,12 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -30,8 +34,16 @@ class SignupActivity : ComponentActivity() {
 
     @Composable
     fun Step1Screen() {
+        val focusManager = LocalFocusManager.current
+
         Column(
-            modifier = Modifier.fillMaxSize().padding(32.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) { focusManager.clearFocus() }
+                .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -78,9 +90,18 @@ class SignupActivity : ComponentActivity() {
 
     @Composable
     fun Step2Screen() {
+        val focusManager = LocalFocusManager.current
         val isExpired = signupViewModel.timerSeconds == 0
 
-        Column(Modifier.fillMaxSize().padding(32.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(           // 클릭 가능
+                    indication = null, // 클릭 효과 없음
+                    interactionSource = remember { MutableInteractionSource() }
+                ) { focusManager.clearFocus() }
+                .padding(32.dp)
+        ) {
             TextButton(onClick = { signupViewModel.goToStep1() }) { Text("< 뒤로") }
 
             Spacer(Modifier.height(16.dp))
@@ -118,14 +139,14 @@ class SignupActivity : ComponentActivity() {
                     Spacer(Modifier.width(12.dp))
                     Text(
                         "%d:%02d".format(signupViewModel.timerSeconds / 60, signupViewModel.timerSeconds % 60),
-                        color = if (isExpired) Color.Red else Color.Green,
+                        color = if (isExpired) Color.Red else Color.Black,
                         fontSize = 18.sp
                     )
                 }
                 Spacer(Modifier.height(16.dp))
 
                 Row(Modifier.fillMaxWidth()) {
-                    OutlinedButton(onClick = { signupViewModel.sendCode() }, Modifier.weight(1f), enabled = isExpired) {
+                    OutlinedButton(onClick = { signupViewModel.sendCode() }, Modifier.weight(1f), enabled = signupViewModel.timerSeconds <= 170) {
                         Text("재발송")
                     }
                     Spacer(Modifier.width(12.dp))
