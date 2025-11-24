@@ -21,8 +21,7 @@ import com.example.myapplication.core.ui.composable.LoadingIndicator
 import com.example.myapplication.features.auth.data.LoginData
 import com.example.myapplication.features.product.data.Product
 import com.example.myapplication.features.restaurant.data.Restaurant
-import com.example.myapplication.features.product.state.ProductApiState
-import com.example.myapplication.features.restaurant.state.RestaurantApiState
+import com.example.myapplication.core.state.PaginationApiState
 import com.example.myapplication.features.product.viewmodel.ProductViewModel
 import com.example.myapplication.features.restaurant.viewmodel.RestaurantViewModel
 
@@ -58,7 +57,7 @@ class ProductActivity : ComponentActivity() {
             ) {
                 tabTitles.forEachIndexed { index, title ->
                     Tab(
-                        //인덱스 0 -> 제품 / 1 -> 레스토랑 & seletedTab = 현재 선택한 탭
+                        //인덱스 0 -> 제품 / 1 -> 레스토랑 / seletedTab = 현재 선택한 탭
                         selected = selectedTab == index,
                         onClick = { selectedTab = index },
                         text = { Text(title) }
@@ -74,10 +73,10 @@ class ProductActivity : ComponentActivity() {
     @Composable
     fun ProductScreen() {
         when (val state = productViewModel.apiState) {
-            is ProductApiState.Initial -> Text("데이터 로딩중...")
-            is ProductApiState.Loading -> LoadingIndicator()
-            is ProductApiState.Success -> ProductList(state.response)
-            is ProductApiState.Error ->  {
+            is PaginationApiState.Initial -> Text("데이터 로딩중...")
+            is PaginationApiState.Loading -> LoadingIndicator()
+            is PaginationApiState.Success -> ProductList(state.response)
+            is PaginationApiState.Error ->  {
                 Column {
                     Text("오류가 발생했습니다. ${state.message}")
                     Button(onClick = { productViewModel.loadContent() }) {
@@ -90,10 +89,10 @@ class ProductActivity : ComponentActivity() {
     @Composable
     fun RestaurantScreen() {
         when (val state = restaurantViewModel.apiState) {
-            is RestaurantApiState.Initial -> Text("데이터 로딩중...")
-            is RestaurantApiState.Loading -> LoadingIndicator()
-            is RestaurantApiState.Success -> RestaurantList(state.response)
-            is RestaurantApiState.Error ->  {
+            is PaginationApiState.Initial -> Text("데이터 로딩중...")
+            is PaginationApiState.Loading -> LoadingIndicator()
+            is PaginationApiState.Success -> RestaurantList(state.response)
+            is PaginationApiState.Error ->  {
                 Column {
                     Text("오류가 발생했습니다. ${state.message}")
                     Button(onClick = { restaurantViewModel.loadContent() }) {
@@ -180,7 +179,7 @@ class ProductActivity : ComponentActivity() {
         }
 
         LaunchedEffect(shouldLoadMore.value) {
-            if (shouldLoadMore.value && !restaurantViewModel.fetchMore) {
+            if (shouldLoadMore.value && !restaurantViewModel.isLoading) {
                 restaurantViewModel.loadContent()
             }
         }
@@ -196,7 +195,7 @@ class ProductActivity : ComponentActivity() {
                 Spacer(Modifier.height(8.dp))
             }
 
-            if (restaurantViewModel.fetchMore) {
+            if (restaurantViewModel.isLoading) {
                 item { LoadingIndicator() }
             }
         }
