@@ -96,6 +96,7 @@ class LoginActivity : ComponentActivity() {
 
                 SubmitButton(enabled = loginViewModel.apiState !is ApiResponse.Loading)
                 Spacer(modifier = Modifier.height(16.dp))
+                GoToSignupButton()
 
 
                 // Sealed class의 state로 UI변환
@@ -165,5 +166,18 @@ class LoginActivity : ComponentActivity() {
             color = Color.Black,
             fontSize = 14.sp
         )
+    }
+
+    @Composable
+    fun GoToSignupButton() {
+        Button(
+            onClick = {
+                val intent = Intent(this@LoginActivity, SignupActivity::class.java)
+                startActivity(intent)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("회원가입")
+        }
     }
 }
