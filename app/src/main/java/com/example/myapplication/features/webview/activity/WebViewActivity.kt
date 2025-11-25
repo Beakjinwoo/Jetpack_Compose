@@ -12,15 +12,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
+import com.example.myapplication.features.auth.data.LoginData
 import com.example.myapplication.features.webview.bridge.JsToKotlinInterface
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class WebViewActivity : ComponentActivity() {
     private var webView: WebView? = null
+    private lateinit var loginData: LoginData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        loginData = LoginData(this)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -45,7 +49,6 @@ class WebViewActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     @Composable
     fun WebViewScreen() {
-        val token = intent.getStringExtra("token")
         AndroidView(
             modifier = Modifier.Companion.fillMaxSize(),
             factory = { context ->
@@ -61,7 +64,7 @@ class WebViewActivity : ComponentActivity() {
 
                     webViewClient = WebViewClient()
 
-                    addJavascriptInterface(JsToKotlinInterface(context, token), "Android")
+                    addJavascriptInterface(JsToKotlinInterface(context, loginData), "Android")
 
                     loadUrl("file:///android_asset/index.html")
                 }

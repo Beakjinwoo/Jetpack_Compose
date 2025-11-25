@@ -49,18 +49,15 @@ class LoginActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 val isLoggedIn = loginData.isLoggedIn.first()
                 if (isLoggedIn) {
-                    val token = loginData.accessToken.first()
-                    if (token != null) {
-                        moveToMain(token)
-                    }
+                    moveToMain()
                 }
             }
 
             // API state 확인 후 UI전환 + movetomain을 이관
             LaunchedEffect(loginViewModel.apiState) {
-                when (val state = loginViewModel.apiState) {
+                when (loginViewModel.apiState) {
                     is ApiResponse.Success -> {
-                        moveToMain(state.token)
+                        moveToMain()
                     }
                     else -> { }
                 }
@@ -111,9 +108,8 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
-    private fun moveToMain(token: String) {
+    private fun moveToMain() {
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
-        intent.putExtra("token", token)
         startActivity(intent)
         finish()
     }

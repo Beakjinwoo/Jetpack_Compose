@@ -4,13 +4,16 @@ import android.content.Context
 import android.os.Build
 import android.webkit.JavascriptInterface
 import android.widget.Toast
+import com.example.myapplication.features.auth.data.LoginData
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 /**
  * JavaScript에서 Kotlin 함수를 호출하기 위한 Bridge
  */
 class JsToKotlinInterface(
     private val context: Context,
-    private val token: String?
+    private val loginData: LoginData
 ) {
 
     // Toast 메시지 띄우기
@@ -28,6 +31,8 @@ class JsToKotlinInterface(
     // 사용자 토큰 가져오기
     @JavascriptInterface
     fun getUserToken(): String {
-        return token ?: "No token available"
+        return runBlocking {
+            loginData.accessToken.first() ?: "No token available"
+        }
     }
 }

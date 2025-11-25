@@ -95,7 +95,7 @@ class SignupViewModel : ViewModel() {
     // 인증번호 확인
     fun verifyCode() {
         errorMessage = null
-        if (verificationCode == "123456") { // todo: 실제 API 연동
+        if (verificationCode == "123456") { // 실제 API연동은 하지 않는다
             timerJob?.cancel()
             isVerified = true
         } else {

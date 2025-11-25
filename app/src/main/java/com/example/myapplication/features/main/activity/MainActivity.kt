@@ -49,16 +49,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         loginData = LoginData(this)
-        val token = intent.getStringExtra("token")
         mainViewModel.loadContents(this)
 
         setContent {
-            MainScreen(token)
+            MainScreen()
         }
     }
 
     @Composable
-    fun MainScreen(token: String?) {
+    fun MainScreen() {
         val uiState = mainViewModel.mainUiState
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -67,7 +66,7 @@ class MainActivity : ComponentActivity() {
                     LoadingIndicator()
                 }
                 is MainUiState.Success -> {
-                    MainScreenContainer(token, uiState)
+                    MainScreenContainer(uiState)
 
                     if (mainViewModel.isRefreshing) {
                         Box(
@@ -100,7 +99,7 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun MainScreenContainer(token: String?, uiState: MainUiState.Success) {
+    fun MainScreenContainer(uiState: MainUiState.Success) {
         PullToRefreshBox(
             isRefreshing = mainViewModel.isRefreshing,
             onRefresh = {
@@ -139,30 +138,29 @@ class MainActivity : ComponentActivity() {
                 }
 
                 item { Spacer(modifier = Modifier.height(16.dp)) }
-                item { Buttons(token) }
+                item { Buttons() }
 
                 item { Spacer(modifier = Modifier.height(16.dp)) }
             }
         }
     }
     @Composable
-    fun Buttons(token: String?) {
+    fun Buttons() {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            WebViewButton(token)
+            WebViewButton()
             LogoutButton()
             GoToProductActivity()
         }
     }
 
     @Composable
-    fun WebViewButton(token: String?) {
+    fun WebViewButton() {
         Button(
             onClick = {
                 val intent = Intent(this@MainActivity, WebViewActivity::class.java)
-                intent.putExtra("token", token)
                 startActivity(intent)
             },
             modifier = Modifier.fillMaxWidth()
